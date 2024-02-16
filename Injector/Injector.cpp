@@ -20,7 +20,7 @@ int main()
         MessageBox(NULL, L"keybd_light", L"find process failed.", NULL);
         return NULL;
     }
-    enable_debug_priveleges();
+    enable_debug_priveleges(); // for access the asus service
 
     auto handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, static_cast<DWORD>(asus_process_id));
     if (!handle)
@@ -52,7 +52,7 @@ int main()
     CloseHandle(thread);
     CloseHandle(handle);
 
-    return 0;
+    return NULL;
 }
 
 /*------------------------------------------------------------------------------------------------*/
@@ -62,15 +62,12 @@ int wait_asus_process()
     auto get_process = [](const wchar_t* process_name) -> int
         {
             HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-
             if (snapshot == INVALID_HANDLE_VALUE) 
             {
                 return NULL;
             }
 
-            PROCESSENTRY32 entry = { };
-            entry.dwSize = sizeof(entry);
-
+            PROCESSENTRY32 entry = { }; entry.dwSize = sizeof(entry);
             if (!Process32First(snapshot, &entry))
             {
                 CloseHandle(snapshot);
@@ -104,7 +101,7 @@ int wait_asus_process()
 
 bool enable_debug_priveleges()
 {
-    HANDLE token = 0;
+    HANDLE token = { };
     TOKEN_PRIVILEGES new_priveleges = { };
 
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &token))
